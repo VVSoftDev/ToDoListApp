@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- colors for general appearance -->
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryLight">#C5CAE9</color>
+    <color name="colorAccent">#303F9F</color>
+
+    <!-- colors taskEntrytask priority selection -->
+    <color name="materialRed">#E74C3C</color>
+    <color name="materialOrange">#E67E22</color>
+    <color name="materialYellow">#F1C40F</color>
+
+
+    <color name="shapeRed">#F44336</color>
+    <color name="trailRed">#B71C1C</color>
+    <color name="backgroundRed">#FFCDD2</color>
+
+    <color name="shapeBlue">#3F51B5</color>
+    <color name="trailBlue">#1A237E</color>
+    <color name="backgroundBlue">#C5CAE9</color>
+
+    <color name="shapeGreen">#4CAF50</color>
+    <color name="trailGreen">#1B5E20</color>
+    <color name="backgroundGreen">#1f8620</color>
+
+</resources>
