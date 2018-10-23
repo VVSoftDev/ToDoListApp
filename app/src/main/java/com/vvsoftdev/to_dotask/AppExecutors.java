@@ -28,6 +28,9 @@ public class AppExecutors {
         this.mainThread = mainThread;
     }
 
+    /*
+    singleton pattern
+     */
     public static AppExecutors getInstance() {
         if (sInstance == null) {
             synchronized (LOCK) {
