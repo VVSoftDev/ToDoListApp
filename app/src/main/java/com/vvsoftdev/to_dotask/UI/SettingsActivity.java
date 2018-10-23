@@ -62,11 +62,13 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_color_key))) {
             loadColorFromPreferences(sharedPreferences);
+            NavUtils.navigateUpFromSameTask(this);
         }
     }
 
     @Override
     public void onBackPressed() {
         //do nothing
+        NavUtils.navigateUpFromSameTask(this);
     }
 }
