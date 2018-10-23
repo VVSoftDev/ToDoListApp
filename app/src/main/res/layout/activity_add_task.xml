@@ -2,7 +2,7 @@
     This vertical linear layout contains all the views in the AddTaskActivity code.
     This includes an EditText to adtaskEntrytask description, and buttons to select a priority
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -15,16 +15,32 @@
 
     <!-- EditText for getttaskEntrytask description input -->
     <EditText
+        android:id="@+id/editTextTaskTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:maxLines="1"
+        android:maxLength="30"
+        android:gravity="start"
+        android:hint="@string/edit_task_title"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin" />
+
+    <!-- EditText for getttaskEntrytask description input -->
+    <EditText
         android:id="@+id/editTextTaskDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextTaskTitle"
         android:gravity="start"
+        android:maxLength="350"
         android:hint="@string/edit_task_description"
-        android:paddingBottom="@dimen/activity_horizontal_margin" />
+        android:layout_marginBottom="@dimen/activity_horizontal_margin" />
 
     <!-- TextView and FrameLayout (which contains buttons) for Priority Selection -->
     <TextView
         style="@style/TextAppearance.AppCompat.Medium"
+        android:id="@+id/priorityTitleTextView"
+        android:layout_above="@+id/radioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
@@ -36,6 +52,7 @@
     <!-- RadioGroup for visible selection of a priority -->
     <RadioGroup
         android:id="@+id/radioGroup"
+        android:layout_above="@+id/saveButton"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_gravity="center"
@@ -77,6 +94,7 @@
     <Button
         android:id="@+id/saveButton"
         style="@style/TextAppearance.AppCompat.Large"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -84,4 +102,4 @@
         android:text="@string/add_button"
         android:textColor="@android:color/primary_text_dark" />
 
-</LinearLayout>
+</RelativeLayout>

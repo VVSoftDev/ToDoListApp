@@ -18,7 +18,7 @@
 
         <!-- TextView that displays the description -->
         <TextView
-            android:id="@+id/taskDescription"
+            android:id="@+id/taskTitle"
             style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

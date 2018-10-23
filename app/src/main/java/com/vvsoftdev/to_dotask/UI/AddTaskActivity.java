@@ -1,9 +1,7 @@
 package com.vvsoftdev.to_dotask.UI;
 
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +15,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 
 
+import com.vvsoftdev.to_dotask.utilities.ReminderUtils;
 import com.vvsoftdev.to_dotask.viewmodel.AddTaskViewModel;
 import com.vvsoftdev.to_dotask.viewmodel.AddTaskViewModelFactory;
 import com.vvsoftdev.to_dotask.AppExecutors;
@@ -33,6 +32,8 @@ public class AddTaskActivity extends AppCompatActivity implements SharedPreferen
     public static final String EXTRA_TASK_ID = "extraTaskId";
     // Extra for the task ID to be received after rotation
     public static final String INSTANCE_TASK_ID = "instanceTaskId";
+
+    public static final String IS_FIRST_TASK = "isFirstTask";
     // Constants for priority
     public static final int PRIORITY_HIGH = 1;
     public static final int PRIORITY_MEDIUM = 2;
@@ -42,9 +43,10 @@ public class AddTaskActivity extends AppCompatActivity implements SharedPreferen
     // Constant for logging
     private static final String TAG = AddTaskActivity.class.getSimpleName();
     // Fields for views
-    EditText mEditText;
+    EditText mDescriptionEditText, mTitleEditText;
     RadioGroup mRadioGroup;
     Button mButton;
+    boolean isFirst;
 
     private int mTaskId = DEFAULT_TASK_ID;
 
@@ -57,7 +59,7 @@ public class AddTaskActivity extends AppCompatActivity implements SharedPreferen
         setContentView(R.layout.activity_add_task);
 
         initViews();
-
+        isFirst = getIntent().getBooleanExtra(IS_FIRST_TASK,false);
         mDb = AppDatabase.getInstance(getApplicationContext());
 
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_TASK_ID)) {
@@ -94,13 +96,21 @@ public class AddTaskActivity extends AppCompatActivity implements SharedPreferen
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister this activity as an OnPreferenceChangedListener to avoid any memory leaks.
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
     /**
      * initViews is called from onCreate to init the member variable views
      */
     private void initViews() {
-        mEditText = findViewById(R.id.editTextTaskDescription);
+        mDescriptionEditText = findViewById(R.id.editTextTaskDescription);
         mRadioGroup = findViewById(R.id.radioGroup);
-
+        mTitleEditText = findViewById(R.id.editTextTaskTitle);
         mButton = findViewById(R.id.saveButton);
         setColorButton();
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -120,8 +130,8 @@ public class AddTaskActivity extends AppCompatActivity implements SharedPreferen
         if (task == null) {
             return;
         }
-
-        mEditText.setText(task.getDescription());
+        mTitleEditText.setText(task.getTitle());
+        mDescriptionEditText.setText(task.getDescription());
         setPriorityInViews(task.getPriority());
     }
 
@@ -130,17 +140,24 @@ public class AddTaskActivity extends AppCompatActivity implements SharedPreferen
      * It retrieves user input and inserts that new task data into the underlying database.
      */
     public void onSaveButtonClicked() {
-        String description = mEditText.getText().toString();
+        String title = mTitleEditText.getText().toString();
+        String description = mDescriptionEditText.getText().toString();
         int priority = getPriorityFromViews();
         Date date = new Date();
 
-        final TaskEntry task = new TaskEntry(description, priority, date);
+        final TaskEntry task = new TaskEntry(title ,description, priority, date);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
                 if (mTaskId == DEFAULT_TASK_ID) {
                     // insert new task
                     mDb.taskDao().insertTask(task);
+                    //if notifications activated in settings and this task is the first element in the todolist, we schedule a job
+                    if(isFirst) {
+                        SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(AddTaskActivity.this);
+                        if (prefs.getBoolean(getString(R.string.pref_reminder_key), false))
+                            ReminderUtils.scheduleToDoTaskReminder(AddTaskActivity.this);
+                    }
                 } else {
                     //update task
                     task.setId(mTaskId);

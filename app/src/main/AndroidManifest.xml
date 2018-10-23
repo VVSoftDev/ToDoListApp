@@ -12,7 +12,8 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <!-- The manifest entry for the MainActivity -->
-        <activity android:name="com.vvsoftdev.to_dotask.UI.MainActivity">
+        <activity android:name="com.vvsoftdev.to_dotask.UI.MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,6 +31,20 @@
             android:name="com.vvsoftdev.to_dotask.UI.SettingsActivity"
             android:parentActivityName=".UI.MainActivity"
             android:label="@string/settings_activity_name" />
+
+        <!--This is required for immediate syncs -->
+        <service
+            android:name=".sync.ToDoReminderIntentService"
+            android:exported="false"/>
+
+        <!-- This is the Service declaration used in conjunction with FirebaseJobDispatcher -->
+        <service
+            android:name=".sync.ToDoReminderFirebaseJobService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
 
     </application>
 

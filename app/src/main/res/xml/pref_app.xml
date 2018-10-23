@@ -2,33 +2,33 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_reminder_key"
+        android:summaryOff="@string/pref_show_reminder_false"
+        android:summaryOn="@string/pref_show_reminder_true"
+        android:title="@string/pref_show_remindez_label" />
     <!--
-    <CheckBoxPreference
-        android:defaultValue="@bool/pref_show_bass_default"
-        android:key="@string/pref_show_bass_key"
-        android:summaryOff="@string/pref_show_false"
-        android:summaryOn="@string/pref_show_true"
-        android:title="@string/pref_show_bass_label" />
+        <CheckBoxPreference
+            android:defaultValue="@bool/pref_show_mid_range_default"
+            android:key="@string/pref_show_mid_range_key"
+            android:summaryOff="@string/pref_show_false"
+            android:summaryOn="@string/pref_show_true"
+            android:title="@string/pref_show_mid_range_label" />
 
-    <CheckBoxPreference
-        android:defaultValue="@bool/pref_show_mid_range_default"
-        android:key="@string/pref_show_mid_range_key"
-        android:summaryOff="@string/pref_show_false"
-        android:summaryOn="@string/pref_show_true"
-        android:title="@string/pref_show_mid_range_label" />
+        <CheckBoxPreference
+            android:defaultValue="@bool/pref_show_treble_default"
+            android:key="@string/pref_show_treble_key"
+            android:summaryOff="@string/pref_show_false"
+            android:summaryOn="@string/pref_show_true"
+            android:title="@string/pref_show_treble_label" />
 
-    <CheckBoxPreference
-        android:defaultValue="@bool/pref_show_treble_default"
-        android:key="@string/pref_show_treble_key"
-        android:summaryOff="@string/pref_show_false"
-        android:summaryOn="@string/pref_show_true"
-        android:title="@string/pref_show_treble_label" />
-
-    <EditTextPreference
-        android:defaultValue="@string/pref_size_default"
-        android:key="@string/pref_size_key"
-        android:title="@string/pref_size_label" />
--->
+        <EditTextPreference
+            android:defaultValue="@string/pref_size_default"
+            android:key="@string/pref_size_key"
+            android:title="@string/pref_size_label" />
+    -->
     <ListPreference
         android:defaultValue="@string/pref_color_red_value"
         android:entries="@array/pref_color_option_labels"

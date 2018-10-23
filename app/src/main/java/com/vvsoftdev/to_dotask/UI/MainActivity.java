@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.vvsoftdev.to_dotask.AppExecutors;
+import com.vvsoftdev.to_dotask.utilities.ReminderUtils;
 import com.vvsoftdev.to_dotask.viewmodel.MainViewModel;
 import com.vvsoftdev.to_dotask.R;
 import com.vvsoftdev.to_dotask.database.AppDatabase;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
     private TaskAdapter mAdapter;
 
     private AppDatabase mDb;
+
+    //boolean used for know if notification already scheduled
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
                         int position = viewHolder.getAdapterPosition();
                         List<TaskEntry> tasks = mAdapter.getTasks();
                         mDb.taskDao().deleteTask(tasks.get(position));
+                        if (mAdapter.getItemCount()<1)
+                            ReminderUtils.cancelReminder();
                     }
                 });
             }
@@ -97,12 +102,16 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
             public void onClick(View view) {
                 // Create a new intent to start an AddTaskActivity
                 Intent addTaskIntent = new Intent(MainActivity.this, AddTaskActivity.class);
+                //if no data, then it'll be the first task added : notify it
+                if(mAdapter.getItemCount()<1)
+                    addTaskIntent.putExtra(AddTaskActivity.IS_FIRST_TASK, true);
                 startActivity(addTaskIntent);
             }
         });
 
         mDb = AppDatabase.getInstance(getApplicationContext());
         setupViewModel();
+
     }
 
     private void setupViewModel() {
@@ -112,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
             public void onChanged(@Nullable List<TaskEntry> taskEntries) {
                 Log.d(TAG, "Updating list of tasks from LiveData in ViewModel");
                 mAdapter.setTasks(taskEntries);
+                setupNotificationPreference();
             }
         });
     }
@@ -128,9 +138,13 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
         // Get all of the values from shared preferences to set it up
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         loadColorFromPreferences(sharedPreferences);
-
         // Register the listener
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    private void setupNotificationPreference() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        launchNotification(sharedPreferences);
     }
 
     //Load the theme color picked in settings, by default red
@@ -148,6 +162,16 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
 
     }
 
+    // launch or not
+    private void launchNotification(SharedPreferences sharedPreferences){
+        if (mAdapter.getItemCount()>0 && sharedPreferences.getBoolean(getString(R.string.pref_reminder_key),false)) {
+            ReminderUtils.scheduleToDoTaskReminder(this);
+        } else if (mAdapter.getItemCount()<1 && sharedPreferences.getBoolean(getString(R.string.pref_reminder_key),false)){
+            ReminderUtils.cancelReminder();
+        } else if (!sharedPreferences.getBoolean(getString(R.string.pref_reminder_key),false))
+            ReminderUtils.cancelReminder();
+    }
+
 
     // Updates the screen if the shared preferences change. This method is required when you make a
     // class implement OnSharedPreferenceChangedListener
@@ -155,7 +179,10 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
          if (key.equals(getString(R.string.pref_color_key))) {
             loadColorFromPreferences(sharedPreferences);
-        }
+            //todo need to find better way to achieve refresh
+             recreate();
+        } else if (key.equals(getString(R.string.pref_reminder_key)))
+             launchNotification(sharedPreferences);
     }
 
     @Override
@@ -164,6 +191,11 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
         // Unregister MainActivity as an OnPreferenceChangedListener to avoid any memory leaks.
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     /**
